@@ -1,0 +1,36 @@
+---
+# yaml-language-server: $schema=https://schema.blue-build.org/recipe-v1.json
+# image will be published to ghcr.io/<user>/<name>
+name: my-os
+# description will be included in the image's metadata
+description: My personal KDE desktop, built on Aurora.
+
+# Aurora is Universal Blue's KDE Plasma image (Fedora Kinoite + codecs, drivers, extras)
+base-image: ghcr.io/ublue-os/aurora
+image-version: stable
+
+# module configuration, executed in order
+modules:
+  - type: files
+    files:
+      - source: system
+        destination: / # copies files/system/* into the image's root folder /
+
+  # Fedora packages baked into the image. Prefer Flatpaks for desktop apps.
+  # - type: dnf
+  #   install:
+  #     packages:
+  #       - htop
+
+  - type: default-flatpaks
+    configurations:
+      - notify: true
+        scope: system
+        # Flathub is used by default
+        install:
+          - com.spotify.Client
+          - com.visualstudio.code
+          - com.microsoft.Edge
+      - scope: user # also add the Flathub user repo, but no user packages
+
+  - type: signing # sets up the signing policy so updates are verified
